@@ -12,13 +12,12 @@ const defaultDBConnection = `mongodb://localhost/garageMonitor`
 const dbURI = process.env.MONGODB_URI || defaultDBConnection
 const dbName = dbURI.substr(dbURI.lastIndexOf('/') + 1)
 const MongoClient = require('mongodb').MongoClient
-const nodemailer = require('nodemailer')
 const expressPort = process.env.PORT || 5000
 const apiToken = process.env.API_TOKEN
-const emailSMTPS = process.env.SMTPS
-const transporter = nodemailer.createTransport(emailSMTPS)
-
-
+const restClient = require('request-promise')
+const MAIL_API_KEY = process.env.MAILGUN_API_KEY
+const MAIL_DOMAIN = process.env.MAILGUN_DOMAIN
+const MAIL_API_URL = `https://api:${MAIL_API_KEY}@api.mailgun.net/v3/${MAIL_DOMAIN}/messages`
 
 const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
@@ -83,8 +82,13 @@ function registerRoutes() {
       post body should look like:
       { message: "Garage door open @ 7:00 pm"}
     */
-    app.post('/sendAlert', (req, res) => {
-        // call email service
+    app.post('/sendAlert', async(req, res) => {
+        try {
+            await sendEmail('cp@cjparker.us', 'this is a test', 'test from node')
+            res.status(201).send('success')
+        } catch (err) {
+            res.status(500).send(err)
+        }
     })
 
     /*
@@ -112,7 +116,21 @@ function initMongo() {
             console.log(`Connected to mongo ${dbURI}`)
         }
     })
+}
 
+async function sendEmail(pTo, subj, textBody) {
+    const emailFormFields = {
+        from: `garage-monitor@cjparker.us`,
+        to: pTo,
+        subject: subj,
+        text: textBody
+    }
+    const emailPost = {
+        method: 'POST',
+        uri: MAIL_API_URL,
+        form: emailFormFields
+    }
+    return restClient.post(MAIL_API_URL, emailPost)
 }
 
 start()

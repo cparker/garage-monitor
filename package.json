@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node cloud-server"
   },
-  "engines" : {
-    "node" : "8"
+  "engines": {
+    "node": "8"
   },
   "author": "cp@cjparker.us",
   "license": "MIT",
@@ -17,7 +17,8 @@
     "express": "^4.16.3",
     "moment": "^2.22.0",
     "mongodb": "^3.0.5",
-    "nodemailer": "^4.6.4"
+    "nodemailer": "^4.6.4",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "eslint": "^4.19.1"
