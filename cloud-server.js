@@ -18,6 +18,7 @@ const restClient = require('request-promise')
 const MAIL_API_KEY = process.env.MAILGUN_API_KEY
 const MAIL_DOMAIN = process.env.MAILGUN_DOMAIN
 const MAIL_API_URL = `https://api:${MAIL_API_KEY}@api.mailgun.net/v3/${MAIL_DOMAIN}/messages`
+const CP_PHONE = process.env.CP_PHONE
 
 const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
@@ -84,7 +85,7 @@ function registerRoutes() {
     */
     app.post('/sendAlert', async(req, res) => {
         try {
-            await sendEmail('cp@cjparker.us', 'this is a test', 'test from node')
+            await sendEmail(`${CP_PHONE}@txt.att.net`, 'this is a test', 'test from node')
             res.status(201).send('success')
         } catch (err) {
             res.status(500).send(err)
