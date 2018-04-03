@@ -102,7 +102,7 @@ async function sendAlert(message) {
     console.log(`sending message: ${message}`)
     const alertPost = {
         uri: sendAlertURL,
-        request: 'POST',
+        method: 'POST',
         json: true,
         body: {
             message: message
@@ -183,7 +183,7 @@ async function handleDoorOpen() {
     const now = moment()
     const post = {
         uri: doorStatusURL,
-        request: 'POST',
+        method: 'POST',
         json: true,
         body: {
             doorOpen: true
@@ -209,7 +209,7 @@ async function handleDoorClose() {
     const now = moment()
     const post = {
         uri: doorStatusURL,
-        request: 'POST',
+        method: 'POST',
         json: true,
         body: {
             doorOpen: false
