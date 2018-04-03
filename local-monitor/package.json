@@ -1,11 +1,11 @@
 {
-  "name": "garage-monitor",
+  "name": "garage-monitor-rpi",
   "version": "0.0.1",
-  "description": "monitor my garage ",
-  "main": "cloud-server.js",
+  "description": "monitor my garage",
+  "main": "local-monitor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node cloud-server"
+    "start": "node local-monitor"
   },
   "engines": {
     "node": "8"
@@ -13,10 +13,11 @@
   "author": "cp@cjparker.us",
   "license": "MIT",
   "dependencies": {
-    "body-parser": "^1.18.2",
-    "express": "^4.16.3",
+    "lodash": "^4.17.5",
+    "raspi": "^5.0.2",
+    "raspi-gpio": "^5.0.0",
+    "ds18b20": "^0.1.0",
     "moment": "^2.22.0",
-    "mongodb": "^3.0.5",
     "request": "^2.85.0",
     "request-promise": "^4.2.2"
   },
