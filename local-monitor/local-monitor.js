@@ -20,6 +20,8 @@ const motionAlertHours = {
     max: process.env.MOTION_ALERT_HOUR_MAX || 19 // 7pm
 }
 
+const apiToken = process.env.API_TOKEN
+
 const doorOpenMessage = `The garage door is open @ __TIME__`
 const doorIsOpeningMessage = `The garage door is opening @ __TIME__`
 const doorIsClosingMessage = `The garage door is closing @ __TIME__`
@@ -41,6 +43,11 @@ let lastMotionEvent
 function start() {
     console.log('start')
     console.log(`args ${JSON.stringify(process.argv, null, 2)}`)
+
+    if (!apiToken) {
+        console.log('API_TOKEN is not set on env')
+        process.exit(1)
+    }
 
     switch (process.argv[2]) {
         case 'checkDoorStatusAndAlert':
@@ -74,6 +81,9 @@ async function checkUploadTemp() {
         json: true,
         body: {
             tempF: temp // TODO what actually comes back from the sensor?
+        },
+        headers: {
+            'x-api-token': apiToken
         }
     }
     try {
@@ -96,7 +106,11 @@ async function sendAlert(message) {
         json: true,
         body: {
             message: message
+        },
+        headers: {
+            'x-api-token': apiToken
         }
+
     }
     try {
         const result = await restClient(alertPost)
@@ -173,6 +187,9 @@ async function handleDoorOpen() {
         json: true,
         body: {
             doorOpen: true
+        },
+        headers: {
+            'x-api-token': apiToken
         }
     }
 
@@ -196,6 +213,9 @@ async function handleDoorClose() {
         json: true,
         body: {
             doorOpen: false
+        },
+        headers: {
+            'x-api-token': apiToken
         }
     }
 
