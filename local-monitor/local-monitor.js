@@ -36,7 +36,7 @@ const motionEventRearmSec = 60
 
 const motionPin = process.env.MOTION_SENSOR_PIN || 4
 const switchPin = process.env.SWITCH_PIN || 5
-const tempSensorID = process.env.TEMP_SENSOR_ID || '12345'
+const tempSensorID = process.env.TEMP_SENSOR_ID || '28-01157173a0ff'
 
 let lastMotionEvent
 
@@ -74,6 +74,7 @@ function checkUploadDoor() {
 
 async function checkUploadTemp() {
     const temp = tempSensor.temperatureSync(tempSensorID)
+    console.log('read temp', temp)
 
     const post = {
         uri: postTempURL,
