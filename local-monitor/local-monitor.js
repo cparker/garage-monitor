@@ -8,6 +8,7 @@ const moment = require('moment')
 const _ = require('lodash')
 const raspi = require('raspi')
 const gpio = require('raspi-gpio')
+const CronJob = require('cron').CronJob
 const restClient = require('request-promise')
 const tempSensor = require('ds18b20')
 const doorOpenAlertHours = {
@@ -49,13 +50,18 @@ function start() {
         process.exit(1)
     }
 
+
+    /*
+      NOTE: if one node process monitoring pins is already running, a second node process will fail upon attempting 
+      to access pins
+    */
     switch (process.argv[2]) {
         case 'checkDoorStatusAndAlert':
             raspi.init(() => {
-              createPinInputs(async() => {
-                await checkDoorStatusAndAlert()
-                process.exit(0)
-              })
+                createPinInputs(async() => {
+                    await checkDoorStatusAndAlert()
+                    process.exit(0)
+                })
             })
             break
 
@@ -66,8 +72,8 @@ function start() {
         case 'checkUploadDoor':
             raspi.init(() => {
                 createPinInputs(async() => {
-                  await checkUploadDoor()
-                  process.exit(0)
+                    await checkUploadDoor()
+                    process.exit(0)
                 })
             })
             break
@@ -76,6 +82,17 @@ function start() {
             startMonitor()
             break
     }
+}
+
+function setupCron() {
+    // every 30 minutes, all day everyday, upload the door state
+    const checkUploadDoorJob = new CronJob('0 */30 * * * *', checkUploadDoor, null, true)
+
+    // one minute after every hour, upload the temperature
+    const checkUploadTempJob = new CronJob('0 1 * * * *', checkUploadTemp, null, true) // the :01 of every hour
+
+    // every 15 minutes, NOT in the 'middle' of the day, send alert if the door is open
+    const checkDoorStatusAndAlertJob = new CronJob('*/15 0-5,19-23 * * *', checkDoorStatusAndAlert, null, true)
 }
 
 async function checkUploadDoor() {
@@ -91,7 +108,7 @@ async function checkUploadDoor() {
             'x-api-token': apiToken
         }
     }
-console.log('about to post', post)
+    console.log('about to post', post)
 
     try {
         const result = await restClient(post)
@@ -175,6 +192,7 @@ async function checkDoorStatusAndAlert() {
 function startMonitor() {
     console.log('starting monitor')
     raspiInit()
+    setupCron()
 }
 
 function createPinInputs(cb) {
