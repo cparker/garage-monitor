@@ -59,7 +59,11 @@ function start() {
             break
 
         case 'checkUploadDoor':
-            checkUploadDoor()
+            raspi.init(() => {
+                createPinInputs(() => {
+                    checkUploadDoor()
+                })
+            })
             break
 
         default:
@@ -165,23 +169,32 @@ function startMonitor() {
     raspiInit()
 }
 
+function createPinInputs(cb) {
+
+    // motion sensor
+    motionInput = new gpio.DigitalInput({
+        pin: `GPIO${motionPin}`
+    })
+
+    // switch sensor
+    switchInput = new gpio.DigitalInput({
+        pin: `GPIO${switchPin}`,
+        pullResistor: gpio.PULL_DOWN
+    })
+
+    if (cb) {
+        cb()
+    }
+}
+
 function raspiInit() {
     raspi.init(() => {
-        // motion sensor
-        motionInput = new gpio.DigitalInput({
-            pin: `GPIO${motionPin}`
-        })
+        createPinInputs()
 
         // motion pin should go HIGH for a short period when motion is detected
         motionInput.on('change', motionPinState => {
             console.log(`motion pin state changed ${motionPinState}`)
             handleMotionEvent()
-        })
-
-        // switch sensor
-        switchInput = new gpio.DigitalInput({
-            pin: `GPIO${switchPin}`,
-            pullResistor: gpio.PULL_DOWN
         })
 
         switchInput.on('change', _.debounce(switchPinState => {
