@@ -51,7 +51,12 @@ function start() {
 
     switch (process.argv[2]) {
         case 'checkDoorStatusAndAlert':
-            checkDoorStatusAndAlert()
+            raspi.init(() => {
+              createPinInputs(async() => {
+                await checkDoorStatusAndAlert()
+                process.exit(0)
+              })
+            })
             break
 
         case 'checkUploadTemp':
@@ -60,8 +65,9 @@ function start() {
 
         case 'checkUploadDoor':
             raspi.init(() => {
-                createPinInputs(() => {
-                    checkUploadDoor()
+                createPinInputs(async() => {
+                  await checkUploadDoor()
+                  process.exit(0)
                 })
             })
             break
@@ -80,10 +86,12 @@ async function checkUploadDoor() {
         body: {
             isOpen: isDoorOpen()
         },
+        json: true,
         headers: {
             'x-api-token': apiToken
         }
     }
+console.log('about to post', post)
 
     try {
         const result = await restClient(post)
@@ -156,11 +164,11 @@ function isMotionAlertingActive() {
 /*
   Called on a cron to check the door status and take action accordingly
 */
-function checkDoorStatusAndAlert() {
+async function checkDoorStatusAndAlert() {
     // if door open after 7pm, send alert
     const now = moment()
     if (isDoorOpen() && isDoorAlertingActive()) {
-        sendAlert(doorOpenMessage.replace('__TIME__', now.format('LT')))
+        await sendAlert(doorOpenMessage.replace('__TIME__', now.format('LT')))
     }
 }
 
