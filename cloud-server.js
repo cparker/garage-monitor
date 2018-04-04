@@ -23,7 +23,7 @@ const emailAlertSubj = `garage door alert`
 const CP_PHONE = process.env.CP_PHONE
 
 // this can be comma separated, these addresses need to be configured in mailgun
-const alertReceiveList = `${CP_PHONE}@${attSMSGateway}`
+const alertReceiveList = process.env.ALERT_LIST || `${CP_PHONE}@${attSMSGateway}`
 
 const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
@@ -109,6 +109,20 @@ function registerRoutes() {
             res.status(201).send(result)
         } catch (err) {
             res.status(500).send(err)
+        }
+    })
+
+    app.get('/doorStatus', async(req, res) => {
+        const doorStatResult = await db.collection(doorStatusCol)
+            .find()
+            .sort({$natural: -1})
+            .limit(1)
+            .toArray()
+
+        if (doorStatResult && doorStatResult.length >= 1) {
+            res.status(200).json(doorStatResult[0])
+        } else {
+            res.status(404)
         }
     })
 }

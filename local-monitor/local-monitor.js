@@ -34,11 +34,11 @@ const doorStatusURL = `${baseURL}/doorStatus`
 
 const motionEventRearmSec = 60
 
-const motionPin = process.env.MOTION_SENSOR_PIN || 4
+const motionPin = process.env.MOTION_SENSOR_PIN || 6
 const switchPin = process.env.SWITCH_PIN || 5
 const tempSensorID = process.env.TEMP_SENSOR_ID || '12345'
 
-let lastMotionEvent
+let lastMotionEvent, switchInput, motionInput
 
 function start() {
     console.log('start')
@@ -68,19 +68,36 @@ function start() {
     }
 }
 
-function checkUploadDoor() {
-    // post door status
+async function checkUploadDoor() {
+    // read the status of the switch and upload door status
+    const post = {
+        method: 'POST',
+        uri: doorStatusURL,
+        body: {
+            isOpen: isDoorOpen()
+        },
+        headers: {
+            'x-api-token': apiToken
+        }
+    }
+
+    try {
+        const result = await restClient(post)
+        console.log('posted door status', result)
+    } catch (err) {
+        console.log('caught error posting door status', err)
+    }
 }
 
 async function checkUploadTemp() {
-    const temp = tempSensor.temperatureSync(tempSensorID)
+    const tempF = cToF(tempSensor.temperatureSync(tempSensorID))
 
     const post = {
         uri: postTempURL,
         method: 'POST',
         json: true,
         body: {
-            tempF: temp // TODO what actually comes back from the sensor?
+            tempF: tempF
         },
         headers: {
             'x-api-token': apiToken
@@ -95,7 +112,9 @@ async function checkUploadTemp() {
 }
 
 function isDoorOpen() {
-    return true
+    // when the garage door is open, the switch contacts are 'touching', which means current is flowing
+    // which means the pin state should be high
+    return switchInput.read() === gpio.HIGH
 }
 
 async function sendAlert(message) {
@@ -110,7 +129,6 @@ async function sendAlert(message) {
         headers: {
             'x-api-token': apiToken
         }
-
     }
     try {
         const result = await restClient(alertPost)
@@ -149,7 +167,7 @@ function startMonitor() {
 function raspiInit() {
     raspi.init(() => {
         // motion sensor
-        const motionInput = new gpio.DigitalInput({
+        motionInput = new gpio.DigitalInput({
             pin: `GPIO${motionPin}`
         })
 
@@ -160,7 +178,7 @@ function raspiInit() {
         })
 
         // switch sensor
-        const switchInput = new gpio.DigitalInput({
+        switchInput = new gpio.DigitalInput({
             pin: `GPIO${switchPin}`,
             pullResistor: gpio.PULL_DOWN
         })
@@ -175,7 +193,6 @@ function raspiInit() {
             }
 
         }, 1000))
-
     })
 }
 
@@ -236,6 +253,10 @@ function handleMotionEvent() {
         lastMotionEvent = now
         sendAlert(motionDetectedMessage.replace('__TIME__', now.format('LT')))
     }
+}
+
+function cToF(ctemp) {
+    return ctemp * 9.0/5.0 + 32.0
 }
 
 // starts things off
