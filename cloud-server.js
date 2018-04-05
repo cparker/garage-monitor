@@ -45,6 +45,10 @@ function checkToken() {
     }
 }
 
+function tokenValid(req) {
+    return req.headers['x-api-token'] !== apiToken
+}
+
 function initExpress() {
     app.use(express.static('.'))
     app.use(bodyParser.json())
@@ -53,13 +57,13 @@ function initExpress() {
     }))
 
     // some simple security
-    app.use((req, res, next) => {
-        if (req.headers['x-api-token'] !== apiToken) {
-            res.sendStatus(401)
-        } else {
-            next()
-        }
-    })
+    // app.use((req, res, next) => {
+    //     if (req.headers['x-api-token'] !== apiToken) {
+    //         res.sendStatus(401)
+    //     } else {
+    //         next()
+    //     }
+    // })
 
     registerRoutes()
     app.listen(expressPort, '0.0.0.0', () => {
@@ -73,14 +77,18 @@ function registerRoutes() {
       { tempF: 55.0 }
     */
     app.post('/temp', async(req, res) => {
-        // save temp to database
-        try {
-            req.body.dateTime = moment().toDate()
-            const result = await db.collection(tempCollection)
-                .insertOne(req.body)
-            res.status(201).send(result)
-        } catch (err) {
-            res.status(500).send(err)
+        if (tokenValid(req)) {
+            // save temp to database
+            try {
+                req.body.dateTime = moment().toDate()
+                const result = await db.collection(tempCollection)
+                    .insertOne(req.body)
+                res.status(201).send(result)
+            } catch (err) {
+                res.status(500).send(err)
+            }
+        } else {
+            res.status(401)
         }
     })
 
@@ -89,11 +97,15 @@ function registerRoutes() {
       { message: "Garage door open @ 7:00 pm"}
     */
     app.post('/sendAlert', async(req, res) => {
-        try {
-            await sendEmail(alertReceiveList, emailAlertSubj, req.body.message)
-            res.status(201).send('success')
-        } catch (err) {
-            res.status(500).send(err)
+        if (tokenValid(req)) {
+            try {
+                await sendEmail(alertReceiveList, emailAlertSubj, req.body.message)
+                res.status(201).send('success')
+            } catch (err) {
+                res.status(500).send(err)
+            }
+        } else {
+            res.status(401)
         }
     })
 
@@ -102,20 +114,26 @@ function registerRoutes() {
       { doorOpen : true | false }
     */
     app.post('/doorStatus', async(req, res) => {
-        try {
-            req.body.dateTime = moment().toDate()
-            const result = await db.collection(doorStatusCol)
-                .insertOne(req.body)
-            res.status(201).send(result)
-        } catch (err) {
-            res.status(500).send(err)
+        if (tokenValid(req)) {
+            try {
+                req.body.dateTime = moment().toDate()
+                const result = await db.collection(doorStatusCol)
+                    .insertOne(req.body)
+                res.status(201).send(result)
+            } catch (err) {
+                res.status(500).send(err)
+            }
+        } else {
+            res.status(401)
         }
     })
 
     app.get('/doorStatus', async(req, res) => {
         const doorStatResult = await db.collection(doorStatusCol)
             .find()
-            .sort({$natural: -1})
+            .sort({
+                $natural: -1
+            })
             .limit(1)
             .toArray()
 
