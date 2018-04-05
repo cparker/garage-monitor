@@ -91,7 +91,7 @@
                 })
                 .then(data => {
                     console.log('data', data)
-                    const mom = moment(data.dataTime)
+                    const mom = moment(data.dateTime)
                     dateTimeElm.innerHTML = mom.format('LT')
                     if (data.doorOpen) {
                         statusElm.innerHTML = 'OPEN'
