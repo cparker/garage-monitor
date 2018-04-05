@@ -96,6 +96,7 @@ function setupCron() {
 }
 
 async function checkUploadDoor() {
+    console.log('checkUploadDoor job started')
     // read the status of the switch and upload door status
     const post = {
         method: 'POST',
@@ -119,6 +120,7 @@ async function checkUploadDoor() {
 }
 
 async function checkUploadTemp() {
+    console.log('checkUploadTemp job started')
     const tempF = cToF(tempSensor.temperatureSync(tempSensorID))
     console.log('read temp', tempF)
 
@@ -182,6 +184,7 @@ function isMotionAlertingActive() {
   Called on a cron to check the door status and take action accordingly
 */
 async function checkDoorStatusAndAlert() {
+    console.log('checkDoorStatusAndAlert job started')
     // if door open after 7pm, send alert
     const now = moment()
     if (isDoorOpen() && isDoorAlertingActive()) {
