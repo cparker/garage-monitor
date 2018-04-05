@@ -1,0 +1,14 @@
+[Unit]
+Description=garage monitor
+After=network.target
+
+[Service]
+ExecStart=API_TOKEN=justlikeheavenwestvirginia /opt/downloads/node/bin/node /opt/projects/garage-monitor/local-monitor/local-monitor.js
+WorkingDirectory=/opt/projects/garage-monitor/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
