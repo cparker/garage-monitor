@@ -3,8 +3,9 @@ Description=garage monitor
 After=network.target
 
 [Service]
-ExecStart=API_TOKEN=justlikeheavenwestvirginia /opt/downloads/node/bin/node /opt/projects/garage-monitor/local-monitor/local-monitor.js
-WorkingDirectory=/opt/projects/garage-monitor/
+Environment=API_TOKEN=justlikeheavenwestvirginia
+ExecStart=/opt/downloads/node/bin/node /opt/projects/garage-monitor/local-monitor/local-monitor.js
+WorkingDirectory=/opt/projects/garage-monitor/local-monitor
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
