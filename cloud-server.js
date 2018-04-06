@@ -78,11 +78,14 @@ function registerRoutes() {
     app.post('/temp', async(req, res) => {
         console.log('handling /temp')
         if (tokenValid(req)) {
+            console.log('token is valid')
             // save temp to database
             try {
                 req.body.dateTime = moment().toDate()
+                console.log('before call to insert')
                 const result = await db.collection(tempCollection)
                     .insertOne(req.body)
+                console.log('after call to insert', result)
                 res.status(201).send(result)
             } catch (err) {
                 res.status(500).send(err)
