@@ -91,6 +91,7 @@ function registerRoutes() {
                 res.status(500).send(err)
             }
         } else {
+            console.log('token is not valid')
             res.status(401)
         }
     })
