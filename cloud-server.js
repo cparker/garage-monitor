@@ -92,7 +92,7 @@ function registerRoutes() {
             }
         } else {
             console.log('token is not valid')
-            res.status(401)
+            res.status(401).send('invalid api token')
         }
     })
 
@@ -109,7 +109,7 @@ function registerRoutes() {
                 res.status(500).send(err)
             }
         } else {
-            res.status(401)
+            res.status(401).send('invalid api token')
         }
     })
 
@@ -128,7 +128,7 @@ function registerRoutes() {
                 res.status(500).send(err)
             }
         } else {
-            res.status(401)
+            res.status(401).send('invalid api token')
         }
     })
 
