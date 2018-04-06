@@ -45,7 +45,7 @@ function checkToken() {
 }
 
 function tokenValid(req) {
-    return req.headers['x-api-token'] !== apiToken
+    return req.headers['x-api-token'] === apiToken
 }
 
 function initExpress() {
