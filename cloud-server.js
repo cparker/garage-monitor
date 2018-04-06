@@ -32,7 +32,6 @@ let db
 
 function start() {
     console.log('starting')
-    console.log('apiToken is', apiToken)
     checkToken()
     initExpress()
     initMongo()
@@ -77,6 +76,7 @@ function registerRoutes() {
       { tempF: 55.0 }
     */
     app.post('/temp', async(req, res) => {
+        console.log('handling /temp')
         if (tokenValid(req)) {
             // save temp to database
             try {
