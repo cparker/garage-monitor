@@ -246,7 +246,7 @@ async function handleDoorOpen() {
         method: 'POST',
         json: true,
         body: {
-            doorOpen: true
+            isOpen: true
         },
         headers: {
             'x-api-token': apiToken
@@ -272,7 +272,7 @@ async function handleDoorClose() {
         method: 'POST',
         json: true,
         body: {
-            doorOpen: false
+            isOpen: false
         },
         headers: {
             'x-api-token': apiToken
