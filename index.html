@@ -93,7 +93,7 @@
                     console.log('data', data)
                     const mom = moment(data.dateTime)
                     dateTimeElm.innerHTML = mom.format('LT')
-                    if (data.doorOpen) {
+                    if (data.isOpen) {
                         statusElm.innerHTML = 'OPEN'
                         mainElm.classList.remove('closed')
                         mainElm.classList.add('open')
