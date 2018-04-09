@@ -124,7 +124,7 @@
                 })
                 .then(data => {
                     console.log('temp data', data)
-                    currentTempElm.innerHTML = data.tempF
+                    currentTempElm.innerHTML = data.tempF.toFixed(1)
                 })
                 .catch(err => {
                     console.log('error fetching temp data')
