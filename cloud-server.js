@@ -76,7 +76,7 @@ function registerRoutes() {
       { tempF: 55.0 }
     */
     app.post('/temp', async(req, res) => {
-        console.log('handling /temp')
+        console.log('handling POST /temp')
         if (tokenValid(req)) {
             // save temp to database
             try {
@@ -89,6 +89,24 @@ function registerRoutes() {
             }
         } else {
             res.status(401).send('invalid api token')
+        }
+    })
+
+    app.get('/temp', async(req, res) => {
+        console.log('handling GET temp')
+
+        const tempResult = await db.collection(tempCollection)
+            .find()
+            .sort({
+                $natural: -1
+            })
+            .limit(1)
+            .toArray()
+
+        if (tempResult && tempResult.length >= 1) {
+            res.status(200).json(tempResult[0])
+        } else {
+            res.status(404)
         }
     })
 

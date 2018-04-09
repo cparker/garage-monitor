@@ -2,6 +2,10 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <title>garage monitor</title>
     <style>
         html {
@@ -74,6 +78,7 @@
                 <div class='date-time'>As of
                     <span class='date-time-value'>--------</span>
                 </div>
+                <div><span class='current-temp'>--</span> ºF</div>
             </div>
         </div>
     </div>
@@ -85,12 +90,14 @@
             const lockOpenElm = document.querySelector('.main .labels .icon .fa-lock-open')
             const statusElm = document.querySelector('.main .text .status')
             const dateTimeElm = document.querySelector('.main .labels .text .date-time-value')
+            const currentTempElm = document.querySelector('.main .labels .text .current-temp')
+
             fetch(`/doorStatus`)
                 .then(response => {
                     return response.json()
                 })
                 .then(data => {
-                    console.log('data', data)
+                    console.log('door data', data)
                     const mom = moment(data.dateTime)
                     dateTimeElm.innerHTML = mom.format('LT')
                     if (data.isOpen) {
@@ -109,6 +116,18 @@
                 })
                 .catch(error => {
                     console.log('error fetching door status', error)
+                })
+
+            fetch('/temp')
+                .then(response => {
+                    return response.json()
+                })
+                .then(data => {
+                    console.log('temp data', data)
+                    currentTempElm.innerHTML = data.tempF
+                })
+                .catch(err => {
+                    console.log('error fetching temp data')
                 })
         }
     </script>
