@@ -41,6 +41,8 @@ const tempSensorID = process.env.TEMP_SENSOR_ID || '28-01157173a0ff'
 
 let lastMotionEvent, switchInput, motionInput
 
+let globalDoorOpenState
+
 function start() {
     console.log('start')
     console.log(`args ${JSON.stringify(process.argv, null, 2)}`)
@@ -240,6 +242,12 @@ function raspiInit() {
 }
 
 async function handleDoorOpen() {
+    // hack here because I'm seeing spurious close signals from the switch pin
+    if (globalDoorOpenState === true) {
+        console.log('ignoring this open event because the door is already open')
+        return false
+    }
+    globalDoorOpenState = true
     const now = moment()
     const post = {
         uri: doorStatusURL,
@@ -263,9 +271,15 @@ async function handleDoorOpen() {
     if (isDoorAlertingActive()) {
         sendAlert(doorIsOpeningMessage.replace('__TIME__', now.format('LT')))
     }
+    return true
 }
 
 async function handleDoorClose() {
+    if (globalDoorOpenState === false) {
+        console.log('ignoring handleDoorClose because its already closed')
+        return false
+    }
+    globalDoorOpenState = false
     const now = moment()
     const post = {
         uri: doorStatusURL,
@@ -288,7 +302,9 @@ async function handleDoorClose() {
     if (isDoorAlertingActive()) {
         sendAlert(doorIsClosingMessage.replace('__TIME__', now.format('LT')))
     }
+    return true
 }
+
 
 function handleMotionEvent() {
     const now = moment()
