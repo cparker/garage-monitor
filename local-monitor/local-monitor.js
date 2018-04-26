@@ -14,12 +14,12 @@ const restClient = require('request-promise')
 const tempSensor = require('ds18b20')
 const doorOpenAlertHours = {
     min: process.env.DOOR_OPEN_ALERT_HOUR_MIN || 5, // 5am
-    max: process.env.DOOR_OPEN_ALERT_HOUR_MAX || 19 // 7pm
+    max: process.env.DOOR_OPEN_ALERT_HOUR_MAX || 18 // 6pm
 }
 
 const motionAlertHours = {
     min: process.env.MOTION_ALERT_HOUR_MIN || 5, // 5am
-    max: process.env.MOTION_ALERT_HOUR_MAX || 19 // 7pm
+    max: process.env.MOTION_ALERT_HOUR_MAX || 18 // 6pm
 }
 
 const apiToken = process.env.API_TOKEN

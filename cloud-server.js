@@ -21,6 +21,8 @@ const MAIL_API_URL = `https://api:${MAIL_API_KEY}@api.mailgun.net/v3/${MAIL_DOMA
 const attSMSGateway = `txt.att.net`
 const emailAlertSubj = `garage door alert`
 const CP_PHONE = process.env.CP_PHONE
+const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
+const slack = require('slack-notify')(SLACK_WEBHOOK_URL)
 
 // this can be comma separated, these addresses need to be configured in mailgun
 const alertReceiveList = process.env.ALERT_LIST || `${CP_PHONE}@${attSMSGateway}`
@@ -117,7 +119,8 @@ function registerRoutes() {
     app.post('/sendAlert', async(req, res) => {
         if (tokenValid(req)) {
             try {
-                await sendEmail(alertReceiveList, emailAlertSubj, req.body.message)
+                // await sendEmail(alertReceiveList, emailAlertSubj, req.body.message)
+                await sendSlack(req.body.message, {})
                 res.status(201).send('success')
             } catch (err) {
                 res.status(500).send(err)
@@ -187,6 +190,22 @@ async function sendEmail(pTo, subj, textBody) {
         form: emailFormFields
     }
     return restClient.post(MAIL_API_URL, emailPost)
+}
+
+async function sendSlack(title, data) {
+    return new Promise((resolve, reject) => {
+        slack.alert({
+            text: title,
+            fields: data
+        }, err => {
+            if (err) {
+                console.log('slack error', err)
+                reject(err)
+            } else {
+                resolve('SLACKED')
+            }
+        })
+    })
 }
 
 start()

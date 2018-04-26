@@ -18,7 +18,8 @@
     "moment": "^2.22.0",
     "mongodb": "^3.0.5",
     "request": "^2.85.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "slack-notify": "^0.1.6"
   },
   "devDependencies": {
     "eslint": "^4.19.1"
