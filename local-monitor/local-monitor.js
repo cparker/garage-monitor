@@ -205,7 +205,8 @@ function createPinInputs(cb) {
 
     // motion sensor
     motionInput = new gpio.DigitalInput({
-        pin: `GPIO${motionPin}`
+        pin: `GPIO${motionPin}`,
+        pullResistor: gpio.PULL_DOWN
     })
 
     // switch sensor
