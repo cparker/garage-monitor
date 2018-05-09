@@ -7,130 +7,43 @@
     <meta name="mobile-web-app-capable" content="yes">
 
     <title>garage monitor</title>
-    <style>
-        html {
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            font-family: sans-serif;
-        }
 
-        body {
-            height: 100%;
-            padding: 0;
-            margin: 0;
-        }
+    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="./metricsgraphics.css">
 
-        .main {
-            height: 50%;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .main .labels {
-            color: white;
-            display: flex;
-            flex-direction: row;
-            flex: 0 0 auto;
-            justify-content: center;
-        }
-
-        .main .labels .icon {
-            flex:0 0 auto;
-            align-self: center;
-        }
-
-        .main .labels .text {
-            flex:0 0 auto;
-            margin-left:10px;
-        }
-
-
-
-        .main .labels .status {
-            font-size: 2.0em;
-        }
-
-        .open {
-            background: red;
-        }
-
-        .closed {
-            background: green;
-        }
-    </style>
     <script defer src="https://use.fontawesome.com/releases/v5.0.4/js/all.js"></script>
     <script src="node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script src="./node_modules/d3/dist/d3.js"></script>
+    <script src="./metricsgraphics.min.js"></script>
+    <script src="./node_modules/moment/min/moment-with-locales.min.js"></script>
 
+    <script src="./main.js"></script>
 </head>
 
 <body>
+
     <div class='main'>
-        <div class='labels'>
-            <div class='icon'>
-                <i class="fas fa-lock-open fa-4x" style="display:none;"></i>
-                <i class="fas fa-lock fa-4x" style="display:none;"></i>
+        <div class='top'>
+            <div class='door-icon'>
+                <i class="fas fa-lock fa-5x"></i>
             </div>
-            <div class='text'>
-                <div class='status'>___</div>
-                <div class='date-time'>As of
-                    <span class='date-time-value'>--------</span>
-                </div>
-                <div><span class='current-temp'>--</span> ºF</div>
+            <div class='door-text'>
+                <h2>Closed</h2>
             </div>
         </div>
+
+        <div class='middle'>
+            <div id="activityChart">Activity</div>
+        </div>
+
+        <div class='bottom'>
+            <div><label>Last update:</label>10:35pm</div>
+            <div><label>Temp:</label>71ºF</div>
+        </div>
+
     </div>
 
-    <script>
-        window.onload = () => {
-            const mainElm = document.querySelector('.main')
-            const lockElm = document.querySelector('.main .labels .icon .fa-lock')
-            const lockOpenElm = document.querySelector('.main .labels .icon .fa-lock-open')
-            const statusElm = document.querySelector('.main .text .status')
-            const dateTimeElm = document.querySelector('.main .labels .text .date-time-value')
-            const currentTempElm = document.querySelector('.main .labels .text .current-temp')
 
-            fetch(`/doorStatus`)
-                .then(response => {
-                    return response.json()
-                })
-                .then(data => {
-                    console.log('door data', data)
-                    const mom = moment(data.dateTime)
-                    dateTimeElm.innerHTML = mom.format('LT')
-                    if (data.isOpen) {
-                        statusElm.innerHTML = 'OPEN'
-                        mainElm.classList.remove('closed')
-                        mainElm.classList.add('open')
-                        lockElm.style.display = 'none'
-                        lockOpenElm.style.display = 'block'
-                    } else {
-                        statusElm.innerHTML = 'CLOSED'
-                        mainElm.classList.remove('open')
-                        mainElm.classList.add('closed')
-                        lockElm.style.display = 'block'
-                        lockOpenElm.style.display = 'none'
-                    }
-                })
-                .catch(error => {
-                    console.log('error fetching door status', error)
-                })
-
-            fetch('/temp')
-                .then(response => {
-                    return response.json()
-                })
-                .then(data => {
-                    console.log('temp data', data)
-                    currentTempElm.innerHTML = data.tempF.toFixed(1)
-                })
-                .catch(err => {
-                    console.log('error fetching temp data')
-                })
-        }
-    </script>
 </body>
 
 </html>
