@@ -25,20 +25,24 @@
     <div class='main'>
         <div class='top'>
             <div class='door-icon'>
-                <i class="fas fa-lock fa-5x"></i>
+                <span class='lock'><i class="fas fa-lock fa-5x"></i></span>
+                <span class='unlock'><i class="fas fa-unlock fa-5x"></i></span>
             </div>
             <div class='door-text'>
-                <h2>Closed</h2>
+                <h2 class='status'>xx</h2>
             </div>
         </div>
 
         <div class='middle'>
-            <div id="activityChart">Activity</div>
+            <div id="activityChart">
+                <h3>Door activity last 24 hours</h3>
+            </div>
         </div>
 
         <div class='bottom'>
-            <div><label>Last update:</label>10:35pm</div>
-            <div><label>Temp:</label>71ºF</div>
+            <div class='spacer'></div>
+            <div><label>Last update:</label><span class='date-time-value'></span></div>
+            <div><label>Temp:</label><span class='temp-value'></span> ºF</div>
         </div>
 
     </div>

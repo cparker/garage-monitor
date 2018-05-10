@@ -49,6 +49,10 @@ body {
     padding-right:0.4em;
 }
 
+.bottom .spacer {
+    height: 0.5em;
+}
+
 .door-icon {
     text-align:center;
     margin:0.5em;

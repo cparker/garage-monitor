@@ -8,7 +8,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const moment = require('moment')
 const app = express()
-const defaultDBConnection = `mongodb://localhost/garageMonitor`
+const defaultDBConnection = `mongodb://localhost/heroku_fvfzjdz2`
 const dbURI = process.env.MONGODB_URI || defaultDBConnection
 const dbName = dbURI.substr(dbURI.lastIndexOf('/') + 1)
 const MongoClient = require('mongodb').MongoClient
@@ -160,6 +160,19 @@ function registerRoutes() {
 
         if (doorStatResult && doorStatResult.length >= 1) {
             res.status(200).json(doorStatResult[0])
+        } else {
+            res.status(404)
+        }
+    })
+
+    app.get('/doorActivity', async(req, res) => {
+        const now = moment()
+        const doorStatResult = await db.collection(doorStatusCol)
+            .find({dateTime: {"$gte" : now.subtract(1, 'days').toDate()}})
+            .toArray()
+
+        if (doorStatResult && doorStatResult.length >= 1) {
+            res.status(200).json(doorStatResult)
         } else {
             res.status(404)
         }

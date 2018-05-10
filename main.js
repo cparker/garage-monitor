@@ -1,7 +1,7 @@
 
 function init() {
-    // displayDoor()
-    // displayTemp()
+    displayDoor()
+    displayTemp()
     displayActivity()
 }
 
@@ -15,17 +15,15 @@ function displayDoor() {
             const mom = moment(data.dateTime)
             page.dateTimeElm.innerHTML = mom.format('LT')
             if (data.isOpen) {
-                page.statusElm.innerHTML = 'OPEN'
-                page.mainElm.classList.remove('closed')
-                page.mainElm.classList.add('open')
+                page.statusElm.innerHTML = 'Open'
                 page.lockElm.style.display = 'none'
                 page.lockOpenElm.style.display = 'block'
+                page.body.style.background = 'red'
             } else {
-                page.statusElm.innerHTML = 'CLOSED'
-                page.mainElm.classList.remove('open')
-                page.mainElm.classList.add('closed')
+                page.statusElm.innerHTML = 'Closed'
                 page.lockElm.style.display = 'block'
                 page.lockOpenElm.style.display = 'none'
+                page.body.style.background = 'green'
             }
         })
         .catch(error => {
@@ -49,16 +47,19 @@ function displayTemp() {
 
 function displayActivity() {
     console.log('displaying activity')
-    fetch('./fake-door.json')
+    fetch('doorActivity')
         .then(response => response.json())
         .then(rawData => {
             console.log('got door data', rawData)
             const data = rawData.map(obj => {
-                obj.date = moment(obj.date).toDate()
+                obj.date = moment(obj.dateTime).toDate()
+                obj.value = obj.isOpen ? 1 : 0
                 return obj
             })
             MG.data_graphic({
                 chart_type: 'line',
+                xax_format: (d) =>  d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }),
+                european_clock: false,
                 interpolate: d3.curveStep,
                 data: data,
                 target: '#activityChart',
@@ -76,12 +77,13 @@ function displayActivity() {
 
 function getPageElements() {
     const page = {}
+    page.body = document.querySelector('body')
     page.mainElm = document.querySelector('.main')
-    page.lockElm = document.querySelector('.main .labels .icon .fa-lock')
-    page.lockOpenElm = document.querySelector('.main .labels .icon .fa-lock-open')
-    page.statusElm = document.querySelector('.main .text .status')
-    page.dateTimeElm = document.querySelector('.main .labels .text .date-time-value')
-    page.currentTempElm = document.querySelector('.main .labels .text .current-temp')
+    page.lockElm = document.querySelector('.door-icon .lock')
+    page.lockOpenElm = document.querySelector('.door-icon .unlock')
+    page.statusElm = document.querySelector('.door-text .status')
+    page.dateTimeElm = document.querySelector('.bottom .date-time-value')
+    page.currentTempElm = document.querySelector('.bottom .temp-value')
     page.activityChart = document.querySelector('#activityChart')
     return page
 }
