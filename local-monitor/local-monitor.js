@@ -180,7 +180,9 @@ function isDoorAlertingActive() {
 
 function isMotionAlertingActive() {
     const now = moment()
-    return now.hour() <= motionAlertHours.min || now.hour() >= motionAlertHours.max
+    //return now.hour() <= motionAlertHours.min || now.hour() >= motionAlertHours.max
+    // FIXME : this is turning out to be a little too unreliable so disabling for now
+    return false
 }
 
 /*
