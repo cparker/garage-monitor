@@ -176,7 +176,9 @@ async function sendAlert(message) {
 
 function isDoorAlertingActive() {
     const now = moment()
-    return now.hour() <= doorOpenAlertHours.min || now.hour() >= doorOpenAlertHours.max
+    // return now.hour() <= doorOpenAlertHours.min || now.hour() >= doorOpenAlertHours.max
+    // FIXME bad logic here
+    return true
 }
 
 function isMotionAlertingActive() {
