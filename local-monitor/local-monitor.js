@@ -95,7 +95,8 @@ function setupCron() {
     const checkUploadTempJob = new CronJob('0 1 * * * *', checkUploadTemp, null, true) // the :01 of every hour
 
     // every 15 minutes, NOT in the 'middle' of the day, send alert if the door is open
-    const checkDoorStatusAndAlertJob = new CronJob('*/15 0-5,19-23 * * *', checkDoorStatusAndAlert, null, true)
+    // const checkDoorStatusAndAlertJob = new CronJob('*/15 0-5,19-23 * * *', checkDoorStatusAndAlert, null, true)
+    const checkDoorStatusAndAlertJob = new CronJob('*/15 * * * *', checkDoorStatusAndAlert, null, true)
 }
 
 async function checkUploadDoor() {
