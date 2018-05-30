@@ -113,6 +113,7 @@ async function checkUploadDoor() {
         }
     }
     console.log('about to post', post)
+    globalDoorOpenState = isDoorOpen()
 
     try {
         const result = await restClient(post)
