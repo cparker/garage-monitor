@@ -115,6 +115,8 @@ function registerRoutes() {
     /*
       post body should look like:
       { message: "Garage door open @ 7:00 pm"}
+
+      TODO : allow this to be switched on / off via state using the s3 API
     */
     app.post('/sendAlert', async(req, res) => {
         if (tokenValid(req)) {

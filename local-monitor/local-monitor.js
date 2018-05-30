@@ -13,8 +13,8 @@ const CronJob = require('cron').CronJob
 const restClient = require('request-promise')
 const tempSensor = require('ds18b20')
 const doorOpenAlertHours = {
-    min: process.env.DOOR_OPEN_ALERT_HOUR_MIN || 5, // 5am
-    max: process.env.DOOR_OPEN_ALERT_HOUR_MAX || 18 // 6pm
+    min: process.env.DOOR_OPEN_ALERT_HOUR_MIN || 0,
+    max: process.env.DOOR_OPEN_ALERT_HOUR_MAX || 23
 }
 
 const motionAlertHours = {
