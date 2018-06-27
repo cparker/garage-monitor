@@ -12,17 +12,14 @@ const gpio = require('raspi-gpio')
 const CronJob = require('cron').CronJob
 const restClient = require('request-promise')
 const tempSensor = require('ds18b20')
-const doorOpenAlertHours = {
-    min: process.env.DOOR_OPEN_ALERT_HOUR_MIN || 0,
-    max: process.env.DOOR_OPEN_ALERT_HOUR_MAX || 23
-}
 
-const motionAlertHours = {
-    min: process.env.MOTION_ALERT_HOUR_MIN || 5, // 5am
-    max: process.env.MOTION_ALERT_HOUR_MAX || 18 // 6pm
-}
-
-const apiToken = process.env.API_TOKEN
+const garageStateLambdaURL = 'https://b4v27ormca.execute-api.us-east-1.amazonaws.com/production/getSetGarageState'
+const AWS_LAMBDA_KEY = process.env.AWS_LAMBDA_KEY || (() => {
+    console.log('please set AWS_LAMBDA_KEY'); process.exit(1)
+})()
+const apiToken = process.env.API_TOKEN || (() => {
+    console.log('please set API_TOKEN'); process.exit(2)
+})()
 
 const doorOpenMessage = `The garage door is open @ __TIME__`
 const doorIsOpeningMessage = `The garage door is opening @ __TIME__`
@@ -30,7 +27,6 @@ const doorIsClosingMessage = `The garage door is closing @ __TIME__`
 const motionDetectedMessage = `Movement detected in garage @ __TIME__`
 
 const baseURL = `http://garage-monitor.herokuapp.com`
-const postTempURL = `${baseURL}/temp`
 const sendAlertURL = `${baseURL}/sendAlert`
 const doorStatusURL = `${baseURL}/doorStatus`
 
@@ -48,33 +44,23 @@ function start() {
     console.log('start')
     console.log(`args ${JSON.stringify(process.argv, null, 2)}`)
 
-    if (!apiToken) {
-        console.log('API_TOKEN is not set on env')
-        process.exit(1)
-    }
-
-
     /*
-      NOTE: if one node process monitoring pins is already running, a second node process will fail upon attempting 
+      NOTE: if one node process monitoring pins is already running, a second node process will fail upon attempting
       to access pins
     */
     switch (process.argv[2]) {
         case 'checkDoorStatusAndAlert':
             raspi.init(() => {
-                createPinInputs(async() => {
+                createPinInputs(async () => {
                     await checkDoorStatusAndAlert()
                     process.exit(0)
                 })
             })
             break
 
-        case 'checkUploadTemp':
-            checkUploadTemp()
-            break
-
         case 'checkUploadDoor':
             raspi.init(() => {
-                createPinInputs(async() => {
+                createPinInputs(async () => {
                     await checkUploadDoor()
                     process.exit(0)
                 })
@@ -92,7 +78,7 @@ function setupCron() {
     const checkUploadDoorJob = new CronJob('0 */30 * * * *', checkUploadDoor, null, true)
 
     // one minute after every hour, upload the temperature
-    const checkUploadTempJob = new CronJob('0 1 * * * *', checkUploadTemp, null, true) // the :01 of every hour
+    // const checkUploadTempJob = new CronJob('0 1 * * * *', checkUploadTemp, null, true) // the :01 of every hour
 
     // every 15 minutes, NOT in the 'middle' of the day, send alert if the door is open
     // const checkDoorStatusAndAlertJob = new CronJob('*/15 0-5,19-23 * * *', checkDoorStatusAndAlert, null, true)
@@ -102,15 +88,18 @@ function setupCron() {
 async function checkUploadDoor() {
     console.log('checkUploadDoor job started')
     // read the status of the switch and upload door status
+    const tempF = cToF(tempSensor.temperatureSync(tempSensorID))
     const post = {
         method: 'POST',
-        uri: doorStatusURL,
+        uri: garageStateLambdaURL,
         body: {
-            isOpen: isDoorOpen()
+            timestamp: moment().format(),
+            open: isDoorOpen(),
+            tempF: tempF
         },
         json: true,
         headers: {
-            'x-api-token': apiToken
+            'x-api-key': `${AWS_LAMBDA_KEY}`
         }
     }
     console.log('about to post', post)
@@ -121,30 +110,6 @@ async function checkUploadDoor() {
         console.log('posted door status', result)
     } catch (err) {
         console.log('caught error posting door status', err)
-    }
-}
-
-async function checkUploadTemp() {
-    console.log('checkUploadTemp job started')
-    const tempF = cToF(tempSensor.temperatureSync(tempSensorID))
-    console.log('read temp', tempF)
-
-    const post = {
-        uri: postTempURL,
-        method: 'POST',
-        json: true,
-        body: {
-            tempF: tempF
-        },
-        headers: {
-            'x-api-token': apiToken
-        }
-    }
-    try {
-        const result = await restClient(post)
-        console.log('successfully posted temp', result)
-    } catch (err) {
-        console.log('caught error while posting temp', err)
     }
 }
 
@@ -184,7 +149,7 @@ function isDoorAlertingActive() {
 
 function isMotionAlertingActive() {
     const now = moment()
-    //return now.hour() <= motionAlertHours.min || now.hour() >= motionAlertHours.max
+    // return now.hour() <= motionAlertHours.min || now.hour() >= motionAlertHours.max
     // FIXME : this is turning out to be a little too unreliable so disabling for now
     return false
 }
@@ -313,7 +278,6 @@ async function handleDoorClose() {
     return true
 }
 
-
 function handleMotionEvent() {
     const now = moment()
     if (isMotionAlertingActive() && now.diff(lastMotionEvent || 0) > motionEventRearmSec * 1000) {
@@ -323,7 +287,7 @@ function handleMotionEvent() {
 }
 
 function cToF(ctemp) {
-    return ctemp * 9.0/5.0 + 32.0
+    return ctemp * 9.0 / 5.0 + 32.0
 }
 
 // starts things off
