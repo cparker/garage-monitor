@@ -183,7 +183,7 @@ function registerRoutes() {
     app.post('/smokedetector', async(req, res, next) => {
         if (tokenValid(req)) {
             if (req.body && req.body.message) {
-                await sendSlack(req.body.message, {})
+                await sendSlack(`SMOKE DETECTOR: ` + req.body.message, {})
                 res.status(200).send('OK')
             }
         } else {
