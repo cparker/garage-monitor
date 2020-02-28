@@ -13,6 +13,7 @@
   "author": "cp@cjparker.us",
   "license": "MIT",
   "dependencies": {
+    "aws-sdk": "^2.292.0",
     "cron": "^1.3.0",
     "ds18b20": "^0.1.0",
     "lodash": "^4.17.5",

@@ -2,7 +2,8 @@
 
 /*
   testing deploy 2
-  This runs on the ras pi
+  This runs on the ras pi in the garage.  It:
+    * uploads status, and temp to AWS dynamo DB
 */
 
 const moment = require('moment')

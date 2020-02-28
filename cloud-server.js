@@ -14,18 +14,8 @@ const dbName = dbURI.substr(dbURI.lastIndexOf('/') + 1)
 const MongoClient = require('mongodb').MongoClient
 const expressPort = process.env.PORT || 5000
 const apiToken = process.env.API_TOKEN
-const restClient = require('request-promise')
-const MAIL_API_KEY = process.env.MAILGUN_API_KEY
-const MAIL_DOMAIN = process.env.MAILGUN_DOMAIN
-const MAIL_API_URL = `https://api:${MAIL_API_KEY}@api.mailgun.net/v3/${MAIL_DOMAIN}/messages`
-const attSMSGateway = `txt.att.net`
-const emailAlertSubj = `garage door alert`
-const CP_PHONE = process.env.CP_PHONE
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
 const slack = require('slack-notify')(SLACK_WEBHOOK_URL)
-
-// this can be comma separated, these addresses need to be configured in mailgun
-const alertReceiveList = process.env.ALERT_LIST || `${CP_PHONE}@${attSMSGateway}`
 
 const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
@@ -170,7 +160,7 @@ function registerRoutes() {
     app.get('/doorActivity', async(req, res) => {
         const now = moment()
         const doorStatResult = await db.collection(doorStatusCol)
-            .find({dateTime: {"$gte" : now.subtract(1, 'days').toDate()}})
+            .find({dateTime: {$gte: now.subtract(1, 'days').toDate()}})
             .toArray()
 
         if (doorStatResult && doorStatResult.length >= 1) {
@@ -190,21 +180,6 @@ function initMongo() {
             console.log(`Connected to mongo ${dbURI}`)
         }
     })
-}
-
-async function sendEmail(pTo, subj, textBody) {
-    const emailFormFields = {
-        from: `garage-monitor@cjparker.us`,
-        to: pTo,
-        subject: subj,
-        text: textBody
-    }
-    const emailPost = {
-        method: 'POST',
-        uri: MAIL_API_URL,
-        form: emailFormFields
-    }
-    return restClient.post(MAIL_API_URL, emailPost)
 }
 
 async function sendSlack(title, data) {
