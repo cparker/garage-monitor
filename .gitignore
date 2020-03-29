@@ -2,3 +2,5 @@ node_modules
 .mischief_managed
 yarn.lock
 .DS_Store
+.vscode/
+yarn.lock

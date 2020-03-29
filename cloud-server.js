@@ -30,6 +30,11 @@ const alertReceiveList = process.env.ALERT_LIST || `${CP_PHONE}@${attSMSGateway}
 const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
 
+const portalMap = {
+    "1" : "basement door",
+    "2" : "door to garage"
+}
+
 let db
 
 function start() {
@@ -190,6 +195,27 @@ function registerRoutes() {
             res.status(401).send('invalid api token')
         }
     })
+
+    /**
+     * {
+     *  "alarmId" : 1,
+     *  "alarmState" : 1
+     * }
+     * 
+     * alarmState 1 == sensors apart
+     * alarmtState 0 == sensors togetger
+     */
+    app.post('/portals', async(req, res, next) => {
+        if (tokenValid(req)) {
+            if (req.body && req.body.message) {
+                await sendSlack(`PORTALS: ` + req.body.message, {})
+                res.status(200).send('OK')
+            }
+        } else {
+            res.status(401).send('invalid api token')
+        }
+    })
+
 }
 
 function initMongo() {

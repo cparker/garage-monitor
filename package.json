@@ -8,7 +8,7 @@
     "start": "node cloud-server"
   },
   "engines": {
-    "node": "8"
+    "node": "12.x"
   },
   "author": "cp@cjparker.us",
   "license": "MIT",
@@ -16,6 +16,7 @@
     "body-parser": "^1.18.2",
     "d3": "^5.3.0",
     "express": "^4.16.3",
+    "lodash": "^4.17.15",
     "moment": "^2.22.1",
     "mongodb": "^3.0.5",
     "request": "^2.85.0",
