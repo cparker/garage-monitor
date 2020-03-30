@@ -225,14 +225,22 @@ function registerRoutes() {
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
         const batteryLevel = _.get(req.body, 'batteryLevel', '')
+        const eventType = _.get(req.body, 'eventType', -1)
         const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} \n ${batteryLevel !== '' ? `battery level ${batteryLevel}` : ''}`
-        sendPortalsMessage(message)
-          .then(() => {
-            res.status(200).send('OK')
-          })
-          .catch(err => {
-            res.status(500).send(err)
-          })
+
+        // for now, only send event types of 0 and 3, which is when the door opens or closes, and startup
+        // event type 1 is polling
+        // event type 3 is startup
+
+        if (eventType === 0 || eventType === 3) {
+          sendPortalsMessage(message)
+            .then(() => {
+              res.status(200).send('OK')
+            })
+            .catch(err => {
+              res.status(500).send(err)
+            })
+        }
       } else {
         console.error('error, no body in /portals')
       }
