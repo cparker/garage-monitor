@@ -25,5 +25,16 @@
   },
   "devDependencies": {
     "eslint": "^4.19.1"
+  },
+  "prettier" : {
+    "singleQuote": true,
+    "semi": false,
+    "tabWidth": 2
+  },
+  "eslintConfig" : {
+    "extends": "eslint:recommended",
+    "rules" : {
+      "indent": ["warn", 3]
+    }
   }
 }
