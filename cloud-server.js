@@ -224,7 +224,8 @@ function registerRoutes() {
         const alarmState = `${_.get(req.body, 'alarmState', -1)}`
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
-        const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')}`
+        const batteryLevel = _.get(req.body, 'batteryLevel', '')
+        const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} \n ${batteryLevel !== '' ? `battery level ${batteryLevel}` : ''}`
         sendPortalsMessage(message)
           .then(() => {
             res.status(200).send('OK')
