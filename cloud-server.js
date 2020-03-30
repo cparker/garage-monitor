@@ -38,7 +38,7 @@ const portalMap = {
 }
 
 const portalStateMap = {
-  '1': 'open',
+  '1': 'opened',
   '0': 'closed',
   '12345': 'restarted'
 }
@@ -224,7 +224,7 @@ function registerRoutes() {
         const alarmState = `${_.get(req.body, 'alarmState', -1)}`
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
-        const message = `PORTALS: ${portalName} is ${portalState}`
+        const message = `${portalName} ${portalState} at ${m().format('HH:mm a')}`
         sendPortalsMessage(message)
           .then(() => {
             res.status(200).send('OK')
