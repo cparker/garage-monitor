@@ -219,6 +219,7 @@ function registerRoutes() {
   app.post('/portals', async (req, res) => {
     if (tokenValid(req)) {
       if (req.body) {
+        console.log('got portals post', JSON.stringify(req.body, null, 2))
         const alarmId = `${_.get(req.body, 'alarmId', -1)}`
         const alarmState = `${_.get(req.body, 'alarmState', -1)}`
         const portalName = _.get(portalMap, alarmId, 'unknown')
