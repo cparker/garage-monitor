@@ -21,7 +21,9 @@ const MAIL_API_URL = `https://api:${MAIL_API_KEY}@api.mailgun.net/v3/${MAIL_DOMA
 // const attSMSGateway = `txt.att.net`
 // const CP_PHONE = process.env.CP_PHONE
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
+const SLACK_PORTALS_WEBHOOK_URL = process.env.SLACK_PORTALS_WEBHOOK_URL
 const slack = require('slack-notify')(SLACK_WEBHOOK_URL)
+const slackPortals = require('slack-notify')(SLACK_PORTALS_WEBHOOK_URL)
 const _ = require('lodash')
 
 // this can be comma separated, these addresses need to be configured in mailgun
@@ -222,11 +224,13 @@ function registerRoutes() {
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
         const message = `PORTALS: ${portalName} is ${portalState}`
-        sendToSlackChannel(message, '#portals').then(() => {
-          res.status(200).send('OK')
-        }).catch(err => {
-          res.status(500).send(err)
-        })
+        sendPortalsMessage(message)
+          .then(() => {
+            res.status(200).send('OK')
+          })
+          .catch(err => {
+            res.status(500).send(err)
+          })
       } else {
         console.error('error, no body in /portals')
       }
@@ -262,9 +266,9 @@ async function sendEmail(pTo, subj, textBody) {
   return restClient.post(MAIL_API_URL, emailPost)
 }
 
-async function sendToSlackChannel(text, channel) {
+async function sendPortalsMessage(text) {
   return new Promise((resolve, reject) => {
-    slack.send({ text, channel }, err => {
+    slackPortals.send({ text, channel: '#portals' }, err => {
       if (err) {
         console.log('slack error', err)
         reject(err)
