@@ -224,7 +224,7 @@ function registerRoutes() {
         const alarmState = `${_.get(req.body, 'alarmState', -1)}`
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
-        const message = `${portalName} ${portalState} at ${m().format('HH:mm a')}`
+        const message = `${portalName} ${portalState} at ${moment().format('HH:mm a')}`
         sendPortalsMessage(message)
           .then(() => {
             res.status(200).send('OK')
