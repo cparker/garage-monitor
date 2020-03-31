@@ -229,10 +229,13 @@ function registerRoutes() {
         const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} \n ${batteryLevel !== '' ? `battery level ${batteryLevel}` : ''}`
 
         // for now, only send event types of 0 and 3, which is when the door opens or closes, and startup
-        // event type 1 is polling
-        // event type 3 is startup
+        // event type:
+        // 0 - window switch changed state
+        // 1 - portal state event (default 15 minute polling)
+        // 2 - heartbeat
+        // 3 - power up
 
-        if (eventType === 0 || eventType === 3) {
+        if (eventType === 0 || eventType === 3 || eventType === 2) {
           sendPortalsMessage(message)
             .then(() => {
               res.status(200).send('OK')
