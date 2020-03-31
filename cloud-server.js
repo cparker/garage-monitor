@@ -33,8 +33,8 @@ const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
 
 const portalMap = {
-  '1': 'basement door',
-  '2': 'door to garage'
+  '1': 'door to garage',
+  '2': 'basement door'
 }
 
 const portalStateMap = {
