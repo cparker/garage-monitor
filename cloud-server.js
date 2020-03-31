@@ -226,7 +226,9 @@ function registerRoutes() {
         const portalState = _.get(portalStateMap, alarmState, 'unknown')
         const batteryLevel = _.get(req.body, 'batteryLevel', '')
         const eventType = _.get(req.body, 'eventType', -1)
-        const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} \n ${batteryLevel !== '' ? `battery level ${batteryLevel}` : ''}`
+        
+        // add the battery level to the message for event types 2 and 3, startup and heartbeat
+        const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} ${eventType === 3 || eventType === 2 ? `\nbattery level ${batteryLevel}` : ''}`
 
         // for now, only send event types of 0 and 3, which is when the door opens or closes, and startup
         // event type:
