@@ -16,6 +16,8 @@
     "body-parser": "^1.18.2",
     "d3": "^5.3.0",
     "express": "^4.16.3",
+    "flow-bin": "^0.122.0",
+    "flowtype": "^2.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.22.1",
     "mongodb": "^3.0.5",
@@ -26,15 +28,18 @@
   "devDependencies": {
     "eslint": "^4.19.1"
   },
-  "prettier" : {
+  "prettier": {
     "singleQuote": true,
     "semi": false,
     "tabWidth": 2
   },
-  "eslintConfig" : {
+  "eslintConfig": {
     "extends": "eslint:recommended",
-    "rules" : {
-      "indent": ["warn", 3]
+    "rules": {
+      "indent": [
+        "warn",
+        3
+      ]
     }
   }
 }

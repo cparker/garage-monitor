@@ -1,3 +1,4 @@
+// @flow
 /*
   Runs in cloud (assuming heroku)
 
@@ -35,12 +36,6 @@ const doorStatusCol = `doorStatus`
 const portalMap = {
   '1': 'door to garage',
   '2': 'basement door'
-}
-
-const portalStateMap = {
-  '1': 'opened',
-  '0': 'closed',
-  '12345': 'restarted'
 }
 
 let db
@@ -217,20 +212,42 @@ function registerRoutes() {
    * alarmtState 0 == sensors togetger
    */
   app.post('/portals', async (req, res) => {
+
+    function generateMessage(eventType, portalName, portalState, batteryLevel) {
+      const now = moment()
+      const portalStateChangeMap = {
+        '0': 'closing',
+        '1': 'opening',
+        '12345': 'restarting'
+      }
+
+      const portalStateStaticMap = {
+        '0': 'closed',
+        '1': 'open'
+      }
+
+      const eventTypeMap = {
+        '0': `${portalName} is ${_.get(portalStateChangeMap, portalState, '')} at ${now.format('hh:mm a')}`,
+        '1': `short interval : ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}`,
+        '2': `heartbeat: ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}, battery level is ${batteryLevel} v`,
+        '3': `portal wifi hub is restarting at ${now.format('hh:mm a')}`
+      }
+      return _.get(eventTypeMap, eventType, `unknown event type ${eventType}`)
+    }
+
     if (tokenValid(req)) {
       if (req.body) {
         console.log('got portals post', JSON.stringify(req.body, null, 2))
         const alarmId = `${_.get(req.body, 'alarmId', -1)}`
         const alarmState = `${_.get(req.body, 'alarmState', -1)}`
         const portalName = _.get(portalMap, alarmId, 'unknown')
-        const portalState = _.get(portalStateMap, alarmState, 'unknown')
         const batteryLevel = _.get(req.body, 'batteryLevel', '')
         const eventType = _.get(req.body, 'eventType', -1)
         
         // add the battery level to the message for event types 2 and 3, startup and heartbeat
-        const message = `${portalName} ${portalState} at ${moment().format('hh:mm a')} ${eventType === 3 || eventType === 2 ? `\nbattery level ${batteryLevel}` : ''}`
+        const message = generateMessage(eventType, portalName, alarmState, batteryLevel)
 
-        // for now, only send event types of 0 and 3, which is when the door opens or closes, and startup
+        // for now, don't send the 15 minute message, because that's too many
         // event type:
         // 0 - window switch changed state
         // 1 - portal state event (default 15 minute polling)
