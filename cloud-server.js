@@ -34,7 +34,7 @@ const tempCollection = `tempF`
 const doorStatusCol = `doorStatus`
 
 const portalMap = {
-  '1': 'door to garage',
+  '1': 'front door',
   '2': 'basement door'
 }
 
@@ -230,7 +230,7 @@ function registerRoutes() {
         '0': `${portalName} is ${_.get(portalStateChangeMap, portalState, '')} at ${now.format('hh:mm a')}`,
         '1': `short interval : ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}`,
         '2': `heartbeat: ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}, battery level is ${batteryLevel} v`,
-        '3': `portal wifi hub is restarting at ${now.format('hh:mm a')}`
+        '3': `${portalName} portal sensor is restarting at ${now.format('hh:mm a')}`
       }
       return _.get(eventTypeMap, eventType, `unknown event type ${eventType}`)
     }
