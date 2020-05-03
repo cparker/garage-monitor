@@ -202,6 +202,11 @@ function registerRoutes() {
     }
   })
 
+  function handleFridgeTemperature(tempF, relativeHumidity, res) {
+    sendSlack (`REFRIGERATOR: temp ${tempF} ºF, humidity ${relativeHumidity}%`)
+    res.status(200).send('OK')
+  }
+
   /**
    * {
    *  "alarmId" : 1,
@@ -243,6 +248,16 @@ function registerRoutes() {
         const portalName = _.get(portalMap, alarmId, 'unknown')
         const batteryLevel = _.get(req.body, 'batteryLevel', '')
         const eventType = _.get(req.body, 'eventType', -1)
+
+        // SPECIAL CASE - an alarm id of '10' is the temp sensor in the fridge
+        // I'm monitoring the fridge temperature because it'd dying :( 
+        if (alarmId === '10') {
+          console.log('handling special case of fridge temperature monitor')
+          const tempF = batteryLevel
+          const relativeHumidity = eventType
+          handleFridgeTemperature(tempF, relativeHumidity, res)
+          return
+        }
         
         // add the battery level to the message for event types 2 and 3, startup and heartbeat
         const message = generateMessage(eventType, portalName, alarmState, batteryLevel)
