@@ -270,11 +270,15 @@ function registerRoutes() {
         // 3 - power up
 
         if (eventType === 0 || eventType === 3 || eventType === 2) {
+          console.log('about to sendPortalsMessage (slack)')
+          
           sendPortalsMessage(message)
             .then(() => {
+              console.log('sent portals slack message OK')
               res.status(200).send('OK')
             })
             .catch(err => {
+              console.error('error sending slack portals message')
               res.status(500).send(err)
             })
         }
