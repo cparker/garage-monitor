@@ -232,7 +232,7 @@ function registerRoutes() {
       }
 
       const eventTypeMap = {
-        '0': `${portalName} is ${_.get(portalStateChangeMap, portalState, '')} at ${now.format('hh:mm a')}`,
+        '0': `${portalName} is ${_.get(portalStateChangeMap, portalState, '')} at ${now.format('hh:mm a')}, battery ${batteryLevel} v`,
         '1': `short interval : ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}`,
         '2': `heartbeat: ${portalName} is ${_.get(portalStateStaticMap, portalState, '')} at ${now.format('hh:mm a')}, battery level is ${batteryLevel} v`,
         '3': `${portalName} portal sensor is restarting at ${now.format('hh:mm a')}`
